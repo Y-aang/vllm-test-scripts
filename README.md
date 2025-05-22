@@ -10,13 +10,15 @@
 
 ## HotSpot Test (Example: SQuAD)
 ### Step 0: Prepare Environment
-Download my vLLM code. Build vLLM from source (Reference to vLLM official manual).
+Download [my vLLM Eviction Strategy Integration](https://github.com/Y-aang/vllm.git). Build vLLM from source (Reference to vLLM official manual).
 ### Step 1: HotSpot sampling
 ```
 python squad_hotspot_sample.py > ./sample/squad_hotspot_sample.txt 2>&1
 ```
 ### Step 2: Run Experiment
-Manually set cache strategy in `Qwen2.5_script.sh` and vLLM's `make_evictor()`. Run
+Manually set cache strategy in `Qwen2.5_script.sh` and vLLM's `make_evictor()`. 
+
+Fill in the configuration in `model_config.py` as instructed in the code comments.
 ```
 python squad_hotspot_sample.py > ./sample/squad_hotspot_sample.txt 2>&1
 ```
@@ -25,4 +27,4 @@ python squad_hotspot_sample.py > ./sample/squad_hotspot_sample.txt 2>&1
 python collect_result.py
 ```
 ### Step 4: Plot the charts
-Copy the `.csv`. Use `view_graph.ipynb`. (From Simulator tool box) 
+Copy the `.csv`. Use `view_graph.ipynb`. (From [Simulator tool box](https://github.com/Y-aang/vLLM-Eviction-Simulator.git)) 
