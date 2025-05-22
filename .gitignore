@@ -4,6 +4,7 @@
 # But keep Python and Shell script files
 !*.py
 !*.sh
+!*.md
 
 # Also keep the .gitignore file itself
 !.gitignore
