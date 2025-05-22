@@ -1,0 +1,12 @@
+# Ignore everything
+*
+
+# But keep Python and Shell script files
+!*.py
+!*.sh
+
+# Also keep the .gitignore file itself
+!.gitignore
+
+# (Optional) Keep directory structure
+!*/
