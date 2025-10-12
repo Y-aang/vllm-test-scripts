@@ -3,12 +3,12 @@ import re
 import pandas as pd
 
 # 设置变量
-model_name = "Qwen2.5-1.5B-Instruct"
-dataset_name = "squad"
-sample_strategy = "hotspot"
+model_name = "DeepSeek-R1-Distill-Qwen-1.5B"
+dataset_name = "wild"
+sample_strategy = "3200"
 cache_strategies = ["arc", "dbl", "lru"]
 cache_strategies = ["lru", "dbl"]
-cache_strategies = ["arc"]
+cache_strategies = ["lru"]
 
 # 初始化结果表，key 为 Cache_Size（如 5、10...）
 results = {}

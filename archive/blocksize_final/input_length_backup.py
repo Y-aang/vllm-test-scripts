@@ -7,11 +7,13 @@ llm = LLM(model="deepseek-ai/DeepSeek-R1-Distill-Qwen-7B", max_model_len=4096, b
 tokenizer = llm.get_tokenizer()
 
 # 构造一个输入文本
+# tmp_256 = "Those is a very long document containing a lot of information,"
 base_text = "Those is a very long document containing a lot of information, discussing various topics in depth. "
 repeat_count = 227
-repeat_count = 15
+# repeat_count = 13
 document = (base_text * repeat_count).strip()
 document = document + "question: who is the president of the state" + "C"
+# document = tmp_256 + document + "question: who is the president of the state" + "C"
 
 # 确保 document 正确生成
 print(f"Generated document length (characters): {len(document)}")

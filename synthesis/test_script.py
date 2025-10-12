@@ -25,11 +25,11 @@ else:
     print(f"File not found: {file_path}")
     
 parser = argparse.ArgumentParser(description="Run vLLM with custom CP_ratio.")
-parser.add_argument("--cp_ratio", type=float, default=20.0, help="Custom CP_ratio value (default: 20.0)")
+parser.add_argument("--cp_ratio", type=float, default=75.0, help="Custom CP_ratio value (default: 20.0)")
 args = parser.parse_args()
 
 # Step 1: Parameters
-model_config = MODEL_CONFIGS['Qwen2.5_Squad']
+model_config = MODEL_CONFIGS['DeepseekR1_QuALITY']
 avg_prompt_len = model_config['avg_prompt_len']       # model related wikiQA 11170.23
 CP_ratio = args.cp_ratio
 
@@ -44,8 +44,9 @@ memory_overhead = model_weight + non_torch_memory + torch_activation
 gpu_memory_utilization = ( (avg_prompt_len * CP_ratio * kv_per_16_tokens / 16.0) + memory_overhead ) / 22.06
 
 # Step 2: Get Data
-json_path = "/home/shenyang/tests/synthesis/sample/squad_sampled_texts_with_questions.json"
+# json_path = "/home/shenyang/tests/synthesis/sample/squad_sampled_texts_with_questions.json"
 # json_path = "/home/shenyang/tests/synthesis/sample/wikiQA_sampled.json"
+json_path = "/home/shenyang/tests/synthesis/sample/quality_sampled_texts_with_questions.json"
 
 with open(json_path, 'r', encoding='utf-8') as json_file:
     prompts = json.load(json_file)

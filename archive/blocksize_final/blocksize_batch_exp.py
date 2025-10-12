@@ -9,7 +9,9 @@ latencies_file = sys.argv[3]
 TEST_ROUND=4
 
 # mistralai/mistral-7b-v0.1 distilgpt2
-llm = LLM(model="mistralai/mistral-7b-v0.1", 
+model_name = "mistralai/mistral-7b-v0.1"
+model_name = "deepseek-ai/DeepSeek-R1-Distill-Qwen-7B"
+llm = LLM(model=model_name, 
           gpu_memory_utilization=0.96,
           max_model_len=4096, 
           block_size=block_size, 

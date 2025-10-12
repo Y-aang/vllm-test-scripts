@@ -18,23 +18,15 @@ sampling_params = SamplingParams(max_tokens=1)
 # model_name = "mistralai/mistral-7b-v0.1"
 # model_name = "HuggingFaceTB/SmolLM2-360M-Instruct"
 # model_name = "Qwen/Qwen2.5-1.5B-Instruct"
-# model_name = "deepseek-ai/DeepSeek-R1-Distill-Qwen-7B"
-model_name = "HuggingFaceTB/SmolLM2-135M-Instruct"
+model_name = "deepseek-ai/DeepSeek-R1-Distill-Qwen-7B"
+# model_name = "HuggingFaceTB/SmolLM2-135M-Instruct"
 llm = LLM(model=model_name, 
           gpu_memory_utilization=0.99,      # 0.657: 134 CUDA blocks
-          max_model_len=25000, 
+          max_model_len=2500, 
           block_size=block_size, 
           disable_sliding_window=True, 
           enable_prefix_caching=True
         )
-# HuggingFaceTB/SmolLM2-360M-Instruct
-# llm = LLM(model="HuggingFaceTB/SmolLM2-360M-Instruct", 
-#           gpu_memory_utilization=0.061,      # 0.657: 134 CUDA blocks
-#           max_model_len=4096, 
-#           block_size=block_size, 
-#           disable_sliding_window=True, 
-#           enable_prefix_caching=True
-#         )
 tokenizer = llm.get_tokenizer()
 
 prefixes = ["This", "That", "These", "These", "Those"]   #classic
