@@ -27,7 +27,8 @@ else:
 parser = argparse.ArgumentParser(description="Run vLLM with custom CP_ratio.")
 parser.add_argument("--cp_ratio", type=float, default=75.0, help="Custom CP_ratio value (default: 20.0)")
 parser.add_argument("--cache_size", type=float, default=10000 * 16, help="Cache Size (Tokens)")
-parser.add_argument("--batch_size", type=int, default=64, help="Batch size for prompts")
+parser.add_argument("--batch_size", type=int, default=1, help="Batch size for prompts")
+parser.add_argument("--cold_start", type=int, default=20000, help="Cold start round number")
 args = parser.parse_args()
 
 # Step 1: Parameters
@@ -61,7 +62,7 @@ json_path = "/home/shenyang/tests/burst/qwen-bailian-usagetraces-anon/sentences.
 
 with open(json_path, 'r', encoding='utf-8') as json_file:
     prompts = json.load(json_file)
-prompts = prompts[:3200]
+prompts = prompts[:]
 
 #Step 3: initialize LLM
 # model_name = "mistralai/mistral-7b-v0.1"
@@ -82,7 +83,11 @@ sampling_params = SamplingParams(max_tokens=1)
 # Step 3: Test
 results = []
 latencies = []
+cold_start_printed = False
 for i in tqdm(range(0, len(prompts), batch_size)):
+    if args.cold_start is not None and i > args.cold_start and not cold_start_printed:
+        print("[cold start]")
+        cold_start_printed = True
     batch_prompts = prompts[i:i+batch_size]
     input_lens = [tokenizer(p, return_tensors="pt")["input_ids"].shape[1] 
               for p in batch_prompts]
@@ -109,3 +114,7 @@ for i in tqdm(range(0, len(prompts), batch_size)):
 
 print('First token latency (s):', [round(lat, 5) for lat in latencies])
 print('Average of first token latencies:', round(sum(latencies) / len(latencies), 5), 's')
+if args.cold_start is not None:
+    cold_start_latencies = latencies[args.cold_start:]
+    if cold_start_latencies:
+        print('Average of first token latencies (after cold start):', round(sum(cold_start_latencies) / len(cold_start_latencies), 5), 's')
