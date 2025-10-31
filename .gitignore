@@ -11,3 +11,6 @@
 
 # (Optional) Keep directory structure
 !*/
+
+# Ignore burst dataset
+burst/
