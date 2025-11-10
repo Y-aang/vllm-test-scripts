@@ -7,10 +7,10 @@ import os
 os.environ["VLLM_ALLOW_LONG_MAX_MODEL_LEN"] = "1"
 
 # block_size = int(sys.argv[1])
-TEST_ROUND=300
+TEST_ROUND=3000
 parser = argparse.ArgumentParser(description="Micro Benchmark")
 parser.add_argument("--block_size", type=int, default=16, help="Cold start round number")
-parser.add_argument("--prompt_length", type=int, default=256, help="Cold start round number")
+parser.add_argument("--prompt_length", type=int, default=512, help="Cold start round number")
 args = parser.parse_args()
 prompt_length = args.prompt_length
 block_size = args.block_size
@@ -43,7 +43,7 @@ for token, token_id in vocab.items():
     if not text:
         continue
     if len(tokenizer(text)["input_ids"]) == 2 \
-        and len(tokenizer(((text + base_text_template) * 16).strip()[:-1])["input_ids"]) == 16 * repeat_count\
+        and len(tokenizer(((text + base_text_template) * repeat_count).strip()[:-1])["input_ids"]) == 16 * repeat_count\
         and text not in single_token_words:
         single_token_words.append(text)
     if len(single_token_words) >= TEST_ROUND:
@@ -98,4 +98,9 @@ print(f"{mean_even:.6f} seconds - Mean Latency (偶数下标,Miss)")
 print(f"{variance_even:.10f} - Standard Deviation (偶数下标,Miss)")
 print(f"{mean_odd:.6f} seconds - Mean Latency (奇数下标, Hit)")
 print(f"{variance_odd:.10f} - Standard Deviation (奇数下标, Hit)")
+
+# 将两个值写入 microbench.txt
+with open("/home/shenyang/tests/verify/result/microbench.txt", "a") as f:
+    f.write(f"{mean_even:.6f},{mean_odd:.6f}\n")
+
 
