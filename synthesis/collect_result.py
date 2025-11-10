@@ -59,7 +59,7 @@ dataset_name = "wild"
 sample_strategy = "all"
 cache_strategies = ["arc", "dbl", "lru"]
 cache_strategies = ["lru", "dbl"]
-cache_strategies = ["arc"]
+cache_strategies = ["lru"]
 
 # 初始化结果表，key 为 Cache_Size（如 5、10...）
 results = {}

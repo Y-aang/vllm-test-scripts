@@ -17,9 +17,10 @@ output_dir="./test/${model_name}/${dataset_name}/${sample_strategy}/${cache_stra
 mkdir -p "$output_dir"
 
 # ========== 测试的 Cache Size 列表 ==========
-# cache_sizes=(2000 5000 10000 20000 38000 15000)
+cache_sizes=(2000 5000 10000 15000 20000 38000)
+cache_sizes=(38000 20000 15000 10000 5000 2000)
 # cache_sizes=(2000 5000 10000)
-cache_sizes=(20000)
+# cache_sizes=(20000)
 
 # ========== 循环执行实验 ==========
 for size in "${cache_sizes[@]}"
