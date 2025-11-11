@@ -16,8 +16,23 @@ plt.figure(figsize=(12, 8))
 # 定义颜色
 colors = {
     'ARC': {'Miss': '#1f77b4', 'Hit': '#ff7f0e'},
-    'LRU': {'Miss': '#2ca02c', 'Hit': '#d62728'}
+    'LRU': {'Miss': '#2ca02c', 'Hit': '#d62728'},
+    'DBL': {'Miss': '#9467bd', 'Hit': '#8c564b'}  # 为 DBL 添加颜色
 }
+
+# 默认颜色列表（用于未定义的类型）
+default_miss_colors = ['#17becf', '#bcbd22', '#e377c2', '#7f7f7f']
+default_hit_colors = ['#c5b0d5', '#c49c94', '#f7b6d3', '#c7c7c7']
+
+def get_color(evictor_type, color_type):
+    """获取颜色，如果未定义则使用默认颜色"""
+    if evictor_type in colors and color_type in colors[evictor_type]:
+        return colors[evictor_type][color_type]
+    else:
+        # 使用默认颜色（基于 evictor_type 的哈希值选择）
+        default_colors = default_miss_colors if color_type == 'Miss' else default_hit_colors
+        idx = hash(evictor_type) % len(default_colors)
+        return default_colors[idx]
 
 # 为每个 EvictorType 绘制折线图
 for evictor_type in df['EvictorType'].unique():
@@ -26,12 +41,12 @@ for evictor_type in df['EvictorType'].unique():
     # 绘制 Miss_Mean
     plt.plot(data['PromptLength'], data['Miss_Mean'], 
              marker='o', linewidth=2, label=f'{evictor_type} Miss_Mean',
-             color=colors[evictor_type]['Miss'])
+             color=get_color(evictor_type, 'Miss'))
     
     # 绘制 Hit_Mean
     plt.plot(data['PromptLength'], data['Hit_Mean'], 
              marker='s', linewidth=2, label=f'{evictor_type} Hit_Mean',
-             color=colors[evictor_type]['Hit'])
+             color=get_color(evictor_type, 'Hit'))
 
 # 设置图形属性
 plt.xlabel('PromptLength', fontsize=12)
@@ -58,7 +73,7 @@ for evictor_type in df['EvictorType'].unique():
     # 只绘制 Hit_Mean
     plt.plot(data['PromptLength'], data['Hit_Mean'], 
              marker='s', linewidth=2, label=f'{evictor_type} Hit_Mean',
-             color=colors[evictor_type]['Hit'])
+             color=get_color(evictor_type, 'Hit'))
 
 # 设置图形属性
 plt.xlabel('PromptLength', fontsize=12)
