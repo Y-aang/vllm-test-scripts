@@ -28,7 +28,7 @@ parser = argparse.ArgumentParser(description="Run vLLM with custom CP_ratio.")
 parser.add_argument("--cp_ratio", type=float, default=75.0, help="Custom CP_ratio value (default: 20.0)")
 parser.add_argument("--cache_size", type=float, default=10000 * 16, help="Cache Size (Tokens)")
 parser.add_argument("--batch_size", type=int, default=1, help="Batch size for prompts")
-parser.add_argument("--cold_start", type=int, default=20000, help="Cold start round number")
+parser.add_argument("--cold_start", type=int, default=1024, help="Cold start round number")
 args = parser.parse_args()
 
 # Step 1: Parameters
@@ -57,8 +57,8 @@ print("gpu_memory_utilization:", gpu_memory_utilization)
 # json_path = "/home/shenyang/tests/synthesis/sample/squad_sampled_texts_with_questions.json"
 # json_path = "/home/shenyang/tests/synthesis/sample/wikiQA_sampled.json"
 # json_path = "/home/shenyang/tests/synthesis/SQuAD/sample/squad_sampled_texts_with_questions.json"
-# json_path = "/home/shenyang/tests/synthesis/Quality/sample/quality_sampled_texts_with_questions.json"
-json_path = "/home/shenyang/tests/burst/qwen-bailian-usagetraces-anon/sentences.json"
+json_path = "/home/shenyang/tests/synthesis/Quality/sample/quality_sampled_texts_with_questions.json"
+# json_path = "/home/shenyang/tests/burst/qwen-bailian-usagetraces-anon/sentences.json"         # TODO Wild Workload
 
 with open(json_path, 'r', encoding='utf-8') as json_file:
     prompts = json.load(json_file)

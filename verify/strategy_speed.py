@@ -7,7 +7,7 @@ import os
 os.environ["VLLM_ALLOW_LONG_MAX_MODEL_LEN"] = "1"
 
 # block_size = int(sys.argv[1])
-TEST_ROUND=3000
+TEST_ROUND=300
 parser = argparse.ArgumentParser(description="Micro Benchmark")
 parser.add_argument("--block_size", type=int, default=16, help="Cold start round number")
 parser.add_argument("--prompt_length", type=int, default=512, help="Cold start round number")

@@ -12,9 +12,9 @@ mkdir -p "$(dirname "$RESULT_FILE")"
 echo "EvictorType,PromptLength,Run,Miss,Hit" > "$RESULT_FILE"
 
 # 定义数组
-evictor_types=(LRU ARC)
-prompt_lengths=(256 1024)
-runs=(1 2 3 4)
+evictor_types=(DBL)
+prompt_lengths=(32 64 128 256 512 1024 2048 4096)
+runs=(1 2 3 4 5 6 7 8)
 
 # 最外层循环：Evictor Type (LRU, ARC)
 for evictor_type in "${evictor_types[@]}"; do

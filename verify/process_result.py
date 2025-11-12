@@ -3,7 +3,7 @@ import numpy as np
 from pathlib import Path
 
 # 读取数据文件
-data_file = Path(__file__).parent / 'result' / 'microbench_3000.txt'
+data_file = Path(__file__).parent / 'result' / 'microbench_300.txt'
 df = pd.read_csv(data_file)
 
 # 过滤掉空行
