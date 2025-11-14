@@ -3,7 +3,7 @@
 # ========== 实验配置 ==========
 model_name="DeepSeek-R1-Distill-Qwen-1.5B"   # 模型名称（可修改）
 dataset_name="wild"                           # 数据集名称（可修改）
-sample_strategy="all"                        # 采样策略（可修改）
+sample_strategy="all_v1"                        # 采样策略（可修改）
 
 script_name="test_script_batch.py"            # 调用的 Python 脚本
 param_name="cache_size"                         # 测试参数名
@@ -13,37 +13,42 @@ block_size=16                                 # ✅ 每个 block 的 token 数�
 # cache_sizes=(2000 5000 10000 15000 20000 38000)
 cache_sizes=(1875 3125 6250 12500 25000 37500)
 evictor_types=(LRU ARC DBL)
+runs=(1 2 3 4)                        # 重跑次数列表
 
 # ========== 循环执行实验 ==========
-# 外层循环：cache size
-for size in "${cache_sizes[@]}"
+# 最外层循环：重跑次数
+for run in "${runs[@]}"
 do
-    # ✅ 使用 block_size 变量
-    actual_size=$((size * block_size))
-    
-    # 内层循环：evictor types
-    for evictor_type in "${evictor_types[@]}"
+    # 第二层循环：cache size
+    for size in "${cache_sizes[@]}"
     do
-        # 将 evictor_type 转换为小写作为 cache_strategy
-        cache_strategy=$(echo "$evictor_type" | tr '[:upper:]' '[:lower:]')
+        # ✅ 使用 block_size 变量
+        actual_size=$((size * block_size))
         
-        # 根据 cache_strategy 构建输出目录
-        output_dir="./test/${model_name}/${dataset_name}/${sample_strategy}/${cache_strategy}"
-        
-        # 创建输出文件夹
-        mkdir -p "$output_dir"
-        
-        # 设置环境变量
-        export VLLM_CUSTOMIZED_EVICTOR_TYPE="$evictor_type"
-        
-        output_file="${output_dir}/${actual_size}.txt"
-        
-        echo "🚀 Running with cache_size=${actual_size} tokens (block_size=${block_size}), evictor_type=${evictor_type}, cache_strategy=${cache_strategy}..."
-        
-        # 调用 Python 脚本并重定向输出
-        python "${script_name}" --${param_name} ${actual_size} > "${output_file}" 2>&1
-        
-        echo "✅ Completed experiment with cache_size=${actual_size}, evictor_type=${evictor_type}, results saved to ${output_file}"
+        # 内层循环：evictor types
+        for evictor_type in "${evictor_types[@]}"
+        do
+            # 将 evictor_type 转换为小写作为 cache_strategy
+            cache_strategy=$(echo "$evictor_type" | tr '[:upper:]' '[:lower:]')
+            
+            # 根据 cache_strategy 构建输出目录
+            output_dir="./test/${model_name}/${dataset_name}/${sample_strategy}/${cache_strategy}"
+            
+            # 创建输出文件夹
+            mkdir -p "$output_dir"
+            
+            # 设置环境变量
+            export VLLM_CUSTOMIZED_EVICTOR_TYPE="$evictor_type"
+            
+            output_file="${output_dir}/${actual_size}_${run}.txt"
+            
+            echo "🚀 Running (${run}/${#runs[@]}) with cache_size=${actual_size} tokens (block_size=${block_size}), evictor_type=${evictor_type}, cache_strategy=${cache_strategy}..."
+            
+            # 调用 Python 脚本并重定向输出
+            python "${script_name}" --${param_name} ${actual_size} > "${output_file}" 2>&1
+            
+            echo "✅ Completed experiment (${run}/${#runs[@]}) with cache_size=${actual_size}, evictor_type=${evictor_type}, results saved to ${output_file}"
+        done
     done
 done
 
