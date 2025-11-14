@@ -5,7 +5,7 @@ import torch.distributed as dist
 import os
 os.environ["VLLM_ALLOW_LONG_MAX_MODEL_LEN"] = "1"
 
-block_size = int(sys.argv[1])
+block_size = 16
 
 TEST_ROUND=5
 
@@ -61,8 +61,8 @@ for idx, document in enumerate(documents):
     # prompt = 'Generate some long passage for me. At least 100 words'
     print(f"vLLM received input length: {tokenizer(prompt, return_tensors='pt')['input_ids'].shape[1]} tokens")
     output = llm.generate(prompt, sampling_params)
-    with open("/home/shenyang/tests/result/block_log.txt", "a") as f:
-        f.write("\n")
+    # with open("/home/shenyang/tests/result/block_log.txt", "a") as f:
+    #     f.write("\n")
     results.append(output)
     metrics = output[0].metrics
     first_token_latency = metrics.first_token_time - metrics.arrival_time  # 计算首 token 生成时间
