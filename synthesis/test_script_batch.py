@@ -17,7 +17,10 @@ if dist.is_initialized():
 random.seed(42)
 np.random.seed(42)
 
-file_path = "/home/shenyang/tests/result/block_log.txt"
+
+os.environ["BLOCK_LOG_FILE_PATH"] = "/home/ubuntu/template/vllm-test-scripts/result/block_log.txt"
+
+file_path = os.environ["BLOCK_LOG_FILE_PATH"]
 if os.path.exists(file_path):
     os.remove(file_path)
     print(f"Deleted: {file_path}")
@@ -93,7 +96,7 @@ for i in tqdm(range(0, len(prompts), batch_size)):
               for p in batch_prompts]
     print(f"Average input length: {sum(input_lens) / len(input_lens):.2f} tokens")
     outputs = llm.generate(batch_prompts, sampling_params)
-    with open("/home/shenyang/tests/result/block_log.txt", "a") as f:
+    with open(file_path, "a") as f:
         f.write("\n")
     
     batch_latencies = []
