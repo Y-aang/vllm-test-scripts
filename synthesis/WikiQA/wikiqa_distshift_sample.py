@@ -17,10 +17,11 @@ model_name = "mistralai/mistral-7b-v0.1"
 # model_name = "HuggingFaceTB/SmolLM2-360M-Instruct"
 # model_name = "HuggingFaceTB/SmolLM2-135M-Instruct"
 # model_name = "microsoft/Phi-3-mini-4k-instruct"
-model_name = "Qwen/Qwen2.5-1.5B-Instruct"
+# model_name = "Qwen/Qwen2.5-1.5B-Instruct"
+model_name = "Qwen/Qwen3-14B"
 llm = LLM(model=model_name, 
           gpu_memory_utilization=0.98,
-          max_model_len=25000,  # 25000
+          max_model_len=40960,  # 25000
           block_size=16, 
           disable_sliding_window=True, 
           enable_prefix_caching=True)
@@ -93,8 +94,8 @@ def power_law_with_hotspot(data, total_length=150, exponent=1.0,
 sampled_texts = power_law_with_hotspot(selected_texts)
 
 # 改进的 Distribution Shift 采样方法
-def distribution_shift_sampling(data, total_length=150, window_size=30, 
-                                exponent=0.1, shuffle_each_window=True):
+def distribution_shift_sampling(data, total_length=1024*3, window_size=512, 
+                                exponent=1.0, shuffle_each_window=True):
     num_windows = total_length // window_size
     result = []
 

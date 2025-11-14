@@ -18,7 +18,7 @@ random.seed(42)
 np.random.seed(42)
 
 
-os.environ["BLOCK_LOG_FILE_PATH"] = "/home/ubuntu/template/vllm-test-scripts/result/block_log.txt"
+os.environ["BLOCK_LOG_FILE_PATH"] = "../result/block_log.txt"
 
 file_path = os.environ["BLOCK_LOG_FILE_PATH"]
 if os.path.exists(file_path):
@@ -32,12 +32,16 @@ parser.add_argument("--cp_ratio", type=float, default=75.0, help="Custom CP_rati
 parser.add_argument("--cache_size", type=float, default=10000 * 16, help="Cache Size (Tokens)")
 parser.add_argument("--batch_size", type=int, default=1, help="Batch size for prompts")
 parser.add_argument("--cold_start", type=int, default=20000, help="Cold start round number")
+parser.add_argument("--model_config", type=str, default='Qwen14B_WikiQA', 
+                    choices=list(MODEL_CONFIGS.keys()),
+                    help="Model configuration name (default: DeepseekR1_Wild)")
 args = parser.parse_args()
 
 # Step 1: Parameters
 # model_config = MODEL_CONFIGS['Qwen2.5_Squad']     # TODO Change dataset & model
 # model_config = MODEL_CONFIGS['DeepseekR1_QuALITY']
 model_config = MODEL_CONFIGS['DeepseekR1_Wild']
+model_config = MODEL_CONFIGS[args.model_config]
 
 block_size = 16
 # block_size = 128
@@ -51,17 +55,19 @@ torch_activation = model_config['torch_activation']        # model related
 kv_per_16_tokens = model_config['kv_per_16_tokens']          # model related
 model_name = model_config['model_name']             # model related
 max_model_len = model_config['max_model_len']             # model related
+gpu_available_memory = 79.18                        # 22.06
 memory_overhead = model_weight + non_torch_memory + torch_activation
 # gpu_memory_utilization = ( (avg_prompt_len * CP_ratio * kv_per_16_tokens / 16.0) + memory_overhead ) / 22.06
-gpu_memory_utilization = ( (cache_size * kv_per_16_tokens / 16.0) + memory_overhead ) / 22.06  # TODO: Count by input (delete it)
+gpu_memory_utilization = ( (cache_size * kv_per_16_tokens / 16.0) + memory_overhead ) / gpu_available_memory  # TODO: Count by input (delete it)
 print("gpu_memory_utilization:", gpu_memory_utilization)
 
 # Step 2: Get Data  # TODO Change dataset
 # json_path = "/home/shenyang/tests/synthesis/sample/squad_sampled_texts_with_questions.json"
 # json_path = "/home/shenyang/tests/synthesis/sample/wikiQA_sampled.json"
+json_path = "./WikiQA/wikiQA_distshift_sampled.json"
 # json_path = "/home/shenyang/tests/synthesis/SQuAD/sample/squad_sampled_texts_with_questions.json"
 # json_path = "/home/shenyang/tests/synthesis/Quality/sample/quality_sampled_texts_with_questions.json"
-json_path = "/home/shenyang/tests/burst/qwen-bailian-usagetraces-anon/sentences.json"         # TODO Wild Workload
+# json_path = "/home/shenyang/tests/burst/qwen-bailian-usagetraces-anon/sentences.json"         # TODO Wild Workload
 
 with open(json_path, 'r', encoding='utf-8') as json_file:
     prompts = json.load(json_file)

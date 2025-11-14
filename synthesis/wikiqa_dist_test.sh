@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # ========== 实验配置 ==========
-model_name="DeepSeek-R1-Distill-Qwen-1.5B"   # 模型名称（可修改）
-dataset_name="Quality"                           # 数据集名称（可修改）
+model_name="Qwen3-14B"   # 模型名称（可修改）
+dataset_name="WikiQA"                           # 数据集名称（可修改）
 sample_strategy="Distshift"                        # 采样策略（可修改）
 
 script_name="test_script_batch.py"            # 调用的 Python 脚本
@@ -10,7 +10,7 @@ param_name="cache_size"                         # 测试参数名
 block_size=16                                 # ✅ 每个 block 的 token 数，可灵活修改
 
 # ========== 测试的 Cache Size 列表 ==========
-cache_sizes=(3125 6250 9375 12500 15625 18750)
+cache_sizes=(3125 6250 12500 18750)
 evictor_types=(LRU ARC DBL)
 
 # ========== 循环执行实验 ==========

@@ -21,9 +21,10 @@ sampling_params = SamplingParams(max_tokens=1)
 # model_name = "deepseek-ai/DeepSeek-R1-Distill-Qwen-7B"
 # model_name = "HuggingFaceTB/SmolLM2-135M-Instruct"
 model_name = "Qwen/Qwen3-8B"
+model_name = "Qwen/Qwen3-14B"
 llm = LLM(model=model_name, 
           gpu_memory_utilization=0.99,      # 0.657: 134 CUDA blocks
-          max_model_len=48060, 
+          max_model_len=40960, 
           block_size=block_size, 
           disable_sliding_window=True, 
           enable_prefix_caching=True
@@ -41,9 +42,9 @@ tokenizer = llm.get_tokenizer()
 prefixes = ["This", "That", "These", "These", "Those"]   #classic
 # prefixes = ["This", "That", "This", "These", "This"]
 base_text_template = " is a very long document containing a lot of information, discussing various topics in depth. "
-# repeat_count = 227  # 227 : 4087 tokens, 128 blocks
+repeat_count = 227  # 227 : 4087 tokens, 128 blocks
 # repeat_count = 666  # 227 : 11989 tokens, 749 blocks
-repeat_count = 15  # 227 : 4087 t/okens, 128 blocks
+# repeat_count = 15  # 227 : 4087 t/okens, 128 blocks
 documents = [((prefix + base_text_template) * repeat_count).strip() for prefix in prefixes]
 
 # documents = [
