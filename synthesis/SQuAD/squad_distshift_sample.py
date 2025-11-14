@@ -4,6 +4,7 @@ from datasets import load_dataset
 from vllm import LLM, SamplingParams
 from tqdm import tqdm
 import random
+from pathlib import Path
 import os
 # os.environ["VLLM_ALLOW_LONG_MAX_MODEL_LEN"] = "1"
 
@@ -171,7 +172,9 @@ for i, text in enumerate(appended_texts[:1]):
     print(f"{i + 1}: {text}\n")
 
 # 可选：保存结果为 JSON（调试用）
-json_path = "/home/shenyang/tests/synthesis/SQuAD/sample/squad_sampled_texts_with_questions.json"
+BASE_DIR = Path(__file__).resolve().parent
+json_path = BASE_DIR / "squad_sampled_texts_with_questions.json"
+# json_path = "/home/shenyang/tests/synthesis/SQuAD/sample/squad_sampled_texts_with_questions.json"
 with open(json_path, 'w', encoding='utf-8') as json_file:
     json.dump(appended_texts, json_file, ensure_ascii=False, indent=4)
 
