@@ -65,6 +65,7 @@ print("gpu_memory_utilization:", gpu_memory_utilization)
 # json_path = "/home/shenyang/tests/synthesis/sample/squad_sampled_texts_with_questions.json"
 # json_path = "/home/shenyang/tests/synthesis/sample/wikiQA_sampled.json"
 json_path = "./WikiQA/wikiQA_distshift_sampled.json"
+json_path = "/home/ubuntu/workplace/vllm-test-scripts/synthesis/Quality/quality_sampled_texts_with_questions.json"
 # json_path = "/home/shenyang/tests/synthesis/SQuAD/sample/squad_sampled_texts_with_questions.json"
 # json_path = "/home/shenyang/tests/synthesis/Quality/sample/quality_sampled_texts_with_questions.json"
 # json_path = "/home/shenyang/tests/burst/qwen-bailian-usagetraces-anon/sentences.json"         # TODO Wild Workload
