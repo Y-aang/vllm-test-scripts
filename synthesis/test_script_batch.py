@@ -32,7 +32,7 @@ parser.add_argument("--cp_ratio", type=float, default=75.0, help="Custom CP_rati
 parser.add_argument("--cache_size", type=float, default=10000 * 16, help="Cache Size (Tokens)")
 parser.add_argument("--batch_size", type=int, default=1, help="Batch size for prompts")
 parser.add_argument("--cold_start", type=int, default=20000, help="Cold start round number")
-parser.add_argument("--model_config", type=str, default='Qwen14B_WikiQA', 
+parser.add_argument("--model_config", type=str, default='DeepseekR1_Wild', 
                     choices=list(MODEL_CONFIGS.keys()),
                     help="Model configuration name (default: DeepseekR1_Wild)")
 args = parser.parse_args()
@@ -55,7 +55,7 @@ torch_activation = model_config['torch_activation']        # model related
 kv_per_16_tokens = model_config['kv_per_16_tokens']          # model related
 model_name = model_config['model_name']             # model related
 max_model_len = model_config['max_model_len']             # model related
-gpu_available_memory = 79.18                        # 22.06
+gpu_available_memory = 22.06                        # 22.06 TODO: Change when changing GPU Platform
 memory_overhead = model_weight + non_torch_memory + torch_activation
 # gpu_memory_utilization = ( (avg_prompt_len * CP_ratio * kv_per_16_tokens / 16.0) + memory_overhead ) / 22.06
 gpu_memory_utilization = ( (cache_size * kv_per_16_tokens / 16.0) + memory_overhead ) / gpu_available_memory  # TODO: Count by input (delete it)
@@ -64,10 +64,10 @@ print("gpu_memory_utilization:", gpu_memory_utilization)
 # Step 2: Get Data  # TODO Change dataset
 # json_path = "/home/shenyang/tests/synthesis/sample/squad_sampled_texts_with_questions.json"
 # json_path = "/home/shenyang/tests/synthesis/sample/wikiQA_sampled.json"
-json_path = "./WikiQA/wikiQA_distshift_sampled.json"
+# json_path = "./WikiQA/wikiQA_distshift_sampled.json"
 # json_path = "/home/shenyang/tests/synthesis/SQuAD/sample/squad_sampled_texts_with_questions.json"
 # json_path = "/home/shenyang/tests/synthesis/Quality/sample/quality_sampled_texts_with_questions.json"
-# json_path = "/home/shenyang/tests/burst/qwen-bailian-usagetraces-anon/sentences.json"         # TODO Wild Workload
+json_path = "/home/shenyang/tests/burst/qwen-bailian-usagetraces-anon/sentences.json"         # TODO Wild Workload
 
 with open(json_path, 'r', encoding='utf-8') as json_file:
     prompts = json.load(json_file)
