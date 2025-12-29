@@ -56,6 +56,17 @@ MODEL_CONFIGS = {
         "model_name": "Qwen/Qwen3-14B",
         "max_model_len": 40960,
     },
+    "Qwen14B_wild": {
+        "avg_prompt_len": None,
+        "CP_ratio": None,
+        "block_size": 16,
+        "model_weight": 27.51,
+        "non_torch_memory": 0.14,
+        "torch_activation": 3.43,
+        "kv_per_16_tokens": 24.417e-4,
+        "model_name": "Qwen/Qwen3-14B",
+        "max_model_len": 25000,
+    },
 
     # Add others like
     # "Mistral7B_SQuAD": {
