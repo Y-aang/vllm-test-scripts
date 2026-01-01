@@ -10,8 +10,9 @@ param_name="cache_size"                         # 测试参数名
 block_size=16                                 # ✅ 每个 block 的 token 数，可灵活修改
 
 # ========== 测试的 Cache Size 列表 ==========
-cache_sizes=(3125 6250 9375 12500 15625 18750)
-evictor_types=(LRU ARC DBL)
+# cache_sizes=(3125 6250 9375 12500 15625 18750)
+cache_sizes=(3125)
+evictor_types=(LRU_L)
 
 # ========== 循环执行实验 ==========
 # 外层循环：cache size
