@@ -55,8 +55,8 @@ def calculate_hitrate_after_cold_start(lines):
 
 # 设置变量
 model_name = "DeepSeek-R1-Distill-Qwen-1.5B"
-dataset_name = "Quality"   # wild  Quality
-sample_strategy = "Distshift" # all  Distshift
+dataset_name = "Length"   # wild  Quality
+sample_strategy = "Random" # all  Distshift
 cache_strategies = ["arc", "dbl", "lru", "lru_l"]
 # cache_strategies = ["lru", "arc"]
 cache_strategies = ["lru_l"]
