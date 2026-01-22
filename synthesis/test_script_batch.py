@@ -9,6 +9,8 @@ import numpy as np
 import os
 import argparse
 from model_config import MODEL_CONFIGS
+from vllm.core.customized_evictor import CustomizedARCEvictor
+from vllm.utils import Device
 
 os.environ["VLLM_ALLOW_LONG_MAX_MODEL_LEN"] = "1"
 
@@ -67,8 +69,8 @@ print("gpu_memory_utilization:", gpu_memory_utilization)
 # json_path = "./WikiQA/wikiQA_distshift_sampled.json"
 # json_path = "/home/shenyang/tests/synthesis/SQuAD/sample/squad_sampled_texts_with_questions.json"
 # json_path = "/home/shenyang/tests/synthesis/Quality/sample/quality_sampled_texts_with_questions.json"
-json_path = "/home/shenyang/tests/synthesis/Length/sentences.json"   # Length Verify
-# json_path = "/home/shenyang/tests/burst/qwen-bailian-usagetraces-anon/sentences.json"         # TODO Wild Workload
+# json_path = "/home/shenyang/tests/synthesis/Length/sentences.json"   # Length Verify
+json_path = "/home/shenyang/tests/burst/qwen-bailian-usagetraces-anon/sentences.json"         # TODO Wild Workload
 
 with open(json_path, 'r', encoding='utf-8') as json_file:
     prompts = json.load(json_file)
@@ -85,6 +87,7 @@ llm = LLM(model=model_name,
           disable_sliding_window=True, 
           enable_prefix_caching=True)
 tokenizer = llm.get_tokenizer()
+evictor = llm.llm_engine.scheduler[0].block_manager.block_allocator._allocators[Device.GPU].evictor
 # sampling_params = SamplingParams(max_tokens=64, min_tokens=48)
 # sampling_params = SamplingParams(max_tokens=32, min_tokens=32)
 sampling_params = SamplingParams(max_tokens=1)
@@ -105,7 +108,15 @@ for i in tqdm(range(0, len(prompts), batch_size)):
     outputs = llm.generate(batch_prompts, sampling_params)
     with open(file_path, "a") as f:
         f.write("\n")
-    
+    # Print L1 size and ratio
+    if isinstance(evictor, CustomizedARCEvictor):
+        L1_size = len(evictor.T1_table)
+        ratio = L1_size / evictor.max_size
+        print(f"Request {i//batch_size:4d} | "
+              f"L1={L1_size:5d} L2={len(evictor.T2_table):5d} T1_act={len(evictor.T1_active):5d} "
+              f"T2_act={len(evictor.T2_active):5d} B1={len(evictor.B1):5d} "
+              f"B2={len(evictor.B2):5d} max={evictor.max_size:5d} ratio={ratio:.4f}")
+
     batch_latencies = []
     for output in outputs:
         metrics = output.metrics
