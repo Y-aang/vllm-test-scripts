@@ -12,15 +12,14 @@ from model_config import MODEL_CONFIGS
 from vllm.core.customized_evictor import CustomizedARCEvictor
 from vllm.utils import Device
 
+# Step 0: Environment setup
 os.environ["VLLM_ALLOW_LONG_MAX_MODEL_LEN"] = "1"
+os.environ["BLOCK_LOG_FILE_PATH"] = "../result/block_log.txt"
 
 if dist.is_initialized():
     dist.destroy_process_group()
 random.seed(42)
 np.random.seed(42)
-
-
-os.environ["BLOCK_LOG_FILE_PATH"] = "../result/block_log.txt"
 
 file_path = os.environ["BLOCK_LOG_FILE_PATH"]
 if os.path.exists(file_path):
@@ -28,7 +27,14 @@ if os.path.exists(file_path):
     print(f"Deleted: {file_path}")
 else:
     print(f"File not found: {file_path}")
-    
+
+# Cache statistics file setup
+cache_stats_file = os.environ.get("CACHE_STATS_JSON_PATH", "../result/cache_stats.json")
+cache_stats_dir = os.path.dirname(cache_stats_file)
+if cache_stats_dir and not os.path.exists(cache_stats_dir):
+    os.makedirs(cache_stats_dir, exist_ok=True)
+
+# Step 1: Parameters
 parser = argparse.ArgumentParser(description="Run vLLM with custom CP_ratio.")
 parser.add_argument("--cp_ratio", type=float, default=75.0, help="Custom CP_ratio value (default: 20.0)")
 parser.add_argument("--cache_size", type=float, default=10000 * 16, help="Cache Size (Tokens)")
@@ -39,7 +45,6 @@ parser.add_argument("--model_config", type=str, default='DeepseekR1_Wild',
                     help="Model configuration name (default: DeepseekR1_Wild)")
 args = parser.parse_args()
 
-# Step 1: Parameters
 # model_config = MODEL_CONFIGS['Qwen2.5_Squad']     # TODO Change dataset & model
 # model_config = MODEL_CONFIGS['DeepseekR1_QuALITY']
 model_config = MODEL_CONFIGS['DeepseekR1_Wild']
@@ -97,6 +102,8 @@ sampling_params = SamplingParams(max_tokens=1)
 results = []
 latencies = []
 cold_start_printed = False
+cache_stats = []
+
 for i in tqdm(range(0, len(prompts), batch_size)):
     if args.cold_start is not None and i > args.cold_start and not cold_start_printed:
         print("[cold start]")
@@ -108,14 +115,22 @@ for i in tqdm(range(0, len(prompts), batch_size)):
     outputs = llm.generate(batch_prompts, sampling_params)
     with open(file_path, "a") as f:
         f.write("\n")
-    # Print L1 size and ratio
+    
+    # Record cache statistics
     if isinstance(evictor, CustomizedARCEvictor):
-        L1_size = len(evictor.T1_table)
-        ratio = L1_size / evictor.max_size
-        print(f"Request {i//batch_size:4d} | "
-              f"L1={L1_size:5d} L2={len(evictor.T2_table):5d} T1_act={len(evictor.T1_active):5d} "
-              f"T2_act={len(evictor.T2_active):5d} B1={len(evictor.B1):5d} "
-              f"B2={len(evictor.B2):5d} max={evictor.max_size:5d} ratio={ratio:.4f}")
+        stat = {
+            "i": i,
+            "L1": len(evictor.T1_table),
+            "L2": len(evictor.T2_table),
+            "T1_act": len(evictor.T1_active),
+            "T2_act": len(evictor.T2_active),
+            "B1": len(evictor.B1),
+            "B2": len(evictor.B2),
+            "max": evictor.max_size,
+            "ratio": len(evictor.T1_table) / evictor.max_size,
+            "is_warmup": args.cold_start is not None and i <= args.cold_start
+        }
+        cache_stats.append(stat)
 
     batch_latencies = []
     for output in outputs:
@@ -139,3 +154,10 @@ if args.cold_start is not None:
     cold_start_latencies = latencies[args.cold_start:]
     if cold_start_latencies:
         print('Average of first token latencies (after cold start):', round(sum(cold_start_latencies) / len(cold_start_latencies), 5), 's')
+
+# Save cache statistics to JSON
+if cache_stats:
+    with open(cache_stats_file, "w") as f:
+        json.dump(cache_stats, f, indent=2)
+    print(f"\n[INFO] Cache statistics saved to {cache_stats_file}")
+    print(f"[INFO] Total data points: {len(cache_stats)}")

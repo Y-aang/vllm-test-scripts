@@ -11,9 +11,12 @@ block_size=16                                 # ✅ 每个 block 的 token 数�
 
 # ========== 测试的 Cache Size 列表 ==========
 # cache_sizes=(2000 5000 10000 15000 20000 38000)
-cache_sizes=(1875 3125 6250 12500 25000 37500)
-evictor_types=(LRU ARC DBL)
-runs=(1 2 3 4)                        # 重跑次数列表
+# cache_sizes=(1875 3125 6250 12500 25000 37500)
+# evictor_types=(LRU ARC DBL)
+# runs=(1 2 3 4)   
+cache_sizes=(18750)
+evictor_types=(ARC)
+runs=(1)                        # 重跑次数列表
 
 # ========== 循环执行实验 ==========
 # 最外层循环：重跑次数
@@ -39,6 +42,10 @@ do
             
             # 设置环境变量
             export VLLM_CUSTOMIZED_EVICTOR_TYPE="$evictor_type"
+            
+            # Setup cache statistics JSON file path
+            cache_stats_json="${output_dir}/${actual_size}_${run}_cache_stats.json"
+            export CACHE_STATS_JSON_PATH="$cache_stats_json"
             
             output_file="${output_dir}/${actual_size}_${run}.txt"
             
