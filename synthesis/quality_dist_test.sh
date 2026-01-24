@@ -12,7 +12,7 @@ block_size=16                                 # ✅ 每个 block 的 token 数�
 # ========== 测试的 Cache Size 列表 ==========
 # cache_sizes=(3125 6250 9375 12500 15625 18750)
 cache_sizes=(3125)
-evictor_types=(LRU_L)
+evictor_types=(ARC)
 
 # ========== 循环执行实验 ==========
 # 外层循环：cache size
@@ -35,6 +35,10 @@ do
         
         # 设置环境变量
         export VLLM_CUSTOMIZED_EVICTOR_TYPE="$evictor_type"
+        
+        # Setup cache statistics JSON file path
+        cache_stats_json="${output_dir}/${actual_size}_cache_stats.json"
+        export CACHE_STATS_JSON_PATH="$cache_stats_json"
         
         output_file="${output_dir}/${actual_size}.txt"
         
